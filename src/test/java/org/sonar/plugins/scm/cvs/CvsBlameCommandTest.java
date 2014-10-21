@@ -91,7 +91,7 @@ public class CvsBlameCommandTest {
     config.setBaseDir(baseDir);
     fs.setBaseDir(baseDir);
     DefaultInputFile inputFile = new DefaultInputFile("foo", DUMMY_JAVA)
-      .setFile(new File(baseDir, DUMMY_JAVA));
+      .setFile(new File(baseDir, DUMMY_JAVA)).setLines(27);
     fs.add(inputFile);
 
     BlameOutput blameResult = mock(BlameOutput.class);
@@ -103,6 +103,7 @@ public class CvsBlameCommandTest {
     String author = "julien";
     verify(blameResult).blameResult(inputFile,
       Arrays.asList(
+        new BlameLine().revision(revision).date(revisionDate).author(author),
         new BlameLine().revision(revision).date(revisionDate).author(author),
         new BlameLine().revision(revision).date(revisionDate).author(author),
         new BlameLine().revision(revision).date(revisionDate).author(author),

@@ -43,6 +43,7 @@ public class CvsConfiguration implements BatchComponent {
   public static final String COMPRESSION_LEVEL_PROP_KEY = "sonar.cvs.compressionLevel";
   public static final String USE_CVSRC_PROP_KEY = "sonar.cvs.useCvsrc";
   public static final String TRACE_PROP_KEY = "sonar.cvs.trace";
+  public static final String REV_PROP_KEY = "sonar.cvs.revision";
 
   public static final String CVS_ROOT_PROP_KEY = "sonar.cvs.cvsRoot";
 
@@ -118,6 +119,15 @@ public class CvsConfiguration implements BatchComponent {
         .category(CoreProperties.CATEGORY_SCM)
         .subCategory(CATEGORY_CVS)
         .index(6)
+        .build(),
+      PropertyDefinition.builder(REV_PROP_KEY)
+        .name("Revision/tag")
+        .description("Revision/tag used to execute annotate (-r)")
+        .type(PropertyType.STRING)
+        .onlyOnQualifiers(Qualifiers.PROJECT)
+        .category(CoreProperties.CATEGORY_SCM)
+        .subCategory(CATEGORY_CVS)
+        .index(7)
         .build());
   }
 
@@ -159,6 +169,11 @@ public class CvsConfiguration implements BatchComponent {
   @CheckForNull
   public String cvsRoot() {
     return settings.getString(CVS_ROOT_PROP_KEY);
+  }
+
+  @CheckForNull
+  public String revision() {
+    return settings.getString(REV_PROP_KEY);
   }
 
 }

@@ -110,6 +110,10 @@ public class CvsBlameCommand extends BlameCommand {
         throw new IllegalStateException("The CVS annotate command [cvs " + Joiner.on(' ').join(args) + "] failed: " + logListener.getStderr().toString(), e);
       }
       List<BlameLine> lines = consumer.getLines();
+      if (lines.size() == inputFile.lines() - 1) {
+        // SONARPLUGINS-3097 CVS do not report blame on last empty line
+        lines.add(lines.get(lines.size() - 1));
+      }
       output.blameResult(inputFile, lines);
     }
     disconnect();
@@ -138,6 +142,11 @@ public class CvsBlameCommand extends BlameCommand {
     if (config.cvsRoot() != null) {
       args.add("-d");
       args.add(config.cvsRoot());
+    }
+
+    if (config.revision() != null) {
+      args.add("-r");
+      args.add(config.revision());
     }
 
     args.add("-q");
