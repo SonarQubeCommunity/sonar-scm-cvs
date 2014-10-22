@@ -82,7 +82,7 @@ public class CvsBlameCommandTest {
     javaUnzip(new File("test-repos/module1.zip"), projectDir);
 
     Settings settings = new Settings(new PropertyDefinitions(CvsConfiguration.getProperties()));
-    settings.setProperty(CvsConfiguration.CVS_ROOT_PROP_KEY, ":local:" + new File(repoDir, "cvsroot").getAbsolutePath());
+    settings.setProperty(CvsConfiguration.CVS_ROOT_PROP_KEY, ":local:" + new File(repoDir, "cvsroot").getAbsolutePath().replaceAll("\\\\", "/"));
     CvsConfiguration config = new CvsConfiguration(settings);
     CvsBlameCommand cvsBlameCommand = new CvsBlameCommand(config,
       new DefaultTempFolder(temp.newFolder()), System2.INSTANCE);
@@ -140,7 +140,7 @@ public class CvsBlameCommandTest {
     javaUnzip(new File("test-repos/module1.zip"), projectDir);
 
     Settings settings = new Settings(new PropertyDefinitions(CvsConfiguration.getProperties()));
-    settings.setProperty(CvsConfiguration.CVS_ROOT_PROP_KEY, ":local:" + new File(repoDir, "cvsroot").getAbsolutePath());
+    settings.setProperty(CvsConfiguration.CVS_ROOT_PROP_KEY, ":local:" + new File(repoDir, "cvsroot").getAbsolutePath().replaceAll("\\\\", "/"));
     CvsConfiguration config = new CvsConfiguration(settings);
     CvsBlameCommand cvsBlameCommand = new CvsBlameCommand(config,
       new DefaultTempFolder(temp.newFolder()), System2.INSTANCE);
