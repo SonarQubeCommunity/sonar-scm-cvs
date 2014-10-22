@@ -1,0 +1,10 @@
+
+Annotations for src/main/java/org/dummy/Dummy.java
+***************
+1.1          (julien   21-Oct-14): package org.dummy;
+1.1          (julien   21-Oct-14): 
+1.1          (julien   21-Oct-14): public class Dummy {
+1.1          (julien   21-Oct-14):   public String sayHello() {
+1.2          (julien   21-Oct-14):     return "Hello From My branch";
+1.1          (julien   21-Oct-14):   }
+1.1          (julien   21-Oct-14): }

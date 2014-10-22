@@ -19,8 +19,9 @@
  */
 package org.sonar.plugins.scm.cvs;
 
+import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import org.netbeans.lib.cvsclient.event.MessageEvent;
 import org.sonar.api.batch.scm.BlameLine;
-import org.sonar.api.utils.command.StreamConsumer;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -32,13 +33,14 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CvsBlameConsumer implements StreamConsumer {
+public class CvsBlameConsumer extends CVSAdapter {
 
   private static final String CVS_TIMESTAMP_PATTERN = "dd-MMM-yy";
 
   /* 1.1 (tor 24-Mar-03): */
   private static final Pattern LINE_PATTERN = Pattern.compile("(.*)\\((.*)\\s+(.*)\\)");
 
+  private final StringBuffer taggedLine = new StringBuffer();
   private List<BlameLine> lines = new ArrayList<BlameLine>();
 
   private DateFormat format;
@@ -49,7 +51,36 @@ public class CvsBlameConsumer implements StreamConsumer {
     this.format = new SimpleDateFormat(CVS_TIMESTAMP_PATTERN, Locale.US);
   }
 
-  public void consumeLine(String line) {
+  /**
+   * Called when the server wants to send a message to be displayed to the
+   * user. The message is only for information purposes and clients can
+   * choose to ignore these messages if they wish.
+   *
+   * {@inheritDoc}
+   */
+  @Override
+  public void messageSent(MessageEvent e) {
+    String line = e.getMessage();
+
+    if (e.isTagged()) {
+      String message = MessageEvent.parseTaggedMessage(taggedLine, e.getMessage());
+      if (message != null) {
+        consume(e.isError(), message);
+      }
+    } else {
+      consume(e.isError(), line);
+    }
+  }
+
+  private void consume(boolean isError, String message) {
+    if (isError) {
+      throw new IllegalStateException(message);
+    } else {
+      consumeLine(message);
+    }
+  }
+
+  private void consumeLine(String line) {
     if (line != null && line.indexOf(':') > 0) {
       String annotation = line.substring(0, line.indexOf(':'));
       Matcher matcher = LINE_PATTERN.matcher(annotation);

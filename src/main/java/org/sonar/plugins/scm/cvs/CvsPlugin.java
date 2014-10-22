@@ -33,7 +33,8 @@ public final class CvsPlugin extends SonarPlugin {
     result.addAll(ImmutableList.of(
       CvsScmProvider.class,
       CvsBlameCommand.class,
-      CvsConfiguration.class));
+      CvsConfiguration.class,
+      CvsCommandExecutor.class));
     result.addAll(CvsConfiguration.getProperties());
     return result;
   }
