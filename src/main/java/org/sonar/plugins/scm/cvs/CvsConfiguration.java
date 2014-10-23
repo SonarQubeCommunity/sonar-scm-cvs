@@ -39,6 +39,7 @@ public class CvsConfiguration implements BatchComponent {
   private static final String CATEGORY_CVS = "CVS";
   public static final String USER_PROP_KEY = "sonar.cvs.username";
   public static final String PASSWORD_PROP_KEY = "sonar.cvs.password.secured";
+  public static final String PASSPHRASE_PROP_KEY = "sonar.cvs.passphrase.secured";
   public static final String DISABLE_COMPRESSION_PROP_KEY = "sonar.cvs.compression.disabled";
   public static final String COMPRESSION_LEVEL_PROP_KEY = "sonar.cvs.compressionLevel";
   public static final String USE_CVSRC_PROP_KEY = "sonar.cvs.useCvsrc";
@@ -72,6 +73,15 @@ public class CvsConfiguration implements BatchComponent {
         .subCategory(CATEGORY_CVS)
         .index(1)
         .build(),
+      PropertyDefinition.builder(PASSPHRASE_PROP_KEY)
+        .name("Passphrase")
+        .description("Passphrase to be used for SSH authentication using public key")
+        .type(PropertyType.PASSWORD)
+        .onQualifiers(Qualifiers.PROJECT)
+        .category(CoreProperties.CATEGORY_SCM)
+        .subCategory(CATEGORY_CVS)
+        .index(2)
+        .build(),
       PropertyDefinition.builder(DISABLE_COMPRESSION_PROP_KEY)
         .name("Disable compression")
         .description("Disable compression")
@@ -79,7 +89,7 @@ public class CvsConfiguration implements BatchComponent {
         .defaultValue(FALSE)
         .category(CoreProperties.CATEGORY_SCM)
         .subCategory(CATEGORY_CVS)
-        .index(2)
+        .index(3)
         .build(),
       PropertyDefinition.builder(COMPRESSION_LEVEL_PROP_KEY)
         .name("Compression level")
@@ -88,7 +98,7 @@ public class CvsConfiguration implements BatchComponent {
         .defaultValue("3")
         .category(CoreProperties.CATEGORY_SCM)
         .subCategory(CATEGORY_CVS)
-        .index(3)
+        .index(4)
         .build(),
       PropertyDefinition.builder(USE_CVSRC_PROP_KEY)
         .name("Use .cvsrc file")
@@ -97,11 +107,11 @@ public class CvsConfiguration implements BatchComponent {
         .defaultValue(FALSE)
         .category(CoreProperties.CATEGORY_SCM)
         .subCategory(CATEGORY_CVS)
-        .index(4)
+        .index(5)
         .build(),
       PropertyDefinition.builder(CVS_ROOT_PROP_KEY)
         .name("CVSRoot")
-        .description("CVSRoot will be automatically detected in most of the cases")
+        .description("CVSRoot string. For example :pserver:host:/folder. Will be automatically detected by default")
         .type(PropertyType.STRING)
         .onlyOnQualifiers(Qualifiers.PROJECT)
         .category(CoreProperties.CATEGORY_SCM)
@@ -149,6 +159,11 @@ public class CvsConfiguration implements BatchComponent {
   @CheckForNull
   public String revision() {
     return settings.getString(REV_PROP_KEY);
+  }
+
+  @CheckForNull
+  public String passphrase() {
+    return settings.getString(PASSPHRASE_PROP_KEY);
   }
 
 }

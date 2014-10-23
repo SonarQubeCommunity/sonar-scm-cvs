@@ -164,7 +164,7 @@ public class CvsBlameCommandTest {
 
     thrown.expect(IllegalStateException.class);
     thrown
-      .expectMessage("The CVS annotate command [cvs -Q -f -T " + tempFile.getAbsolutePath()
+      .expectMessage("The CVS annotate command [cvs -d :pserver:bar -Q -f -T " + tempFile.getAbsolutePath()
         + " annotate src/foo.xoo] failed.");
     thrown.expectMessage("Unknow error");
 

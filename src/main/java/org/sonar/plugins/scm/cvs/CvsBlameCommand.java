@@ -83,12 +83,16 @@ public class CvsBlameCommand extends BlameCommand {
       }
       output.blameResult(inputFile, lines);
     }
-    commandExecutor.disconnect();
   }
 
   private String commandToString(GlobalOptions globalOptions, List<String> args) {
     StringBuilder sb = new StringBuilder();
     sb.append("cvs ");
+    if (globalOptions.getCVSRoot() != null) {
+      sb.append("-d ");
+      sb.append(globalOptions.getCVSRoot());
+      sb.append(" ");
+    }
     sb.append(globalOptions.getCVSCommand().trim());
     sb.append(" ");
     sb.append(ANNOTATE);
