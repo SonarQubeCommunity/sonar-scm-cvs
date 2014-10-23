@@ -39,6 +39,7 @@ import org.netbeans.lib.cvsclient.event.CVSListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.BatchComponent;
+import org.sonar.api.batch.InstantiationStrategy;
 import org.sonar.api.utils.System2;
 
 import javax.annotation.Nullable;
@@ -51,6 +52,7 @@ import java.io.IOException;
 /**
  * Highly inspired from Maven SCM CVS provider
  */
+@InstantiationStrategy(InstantiationStrategy.PER_BATCH)
 public class CvsCommandExecutor implements BatchComponent {
 
   private static final Logger LOG = LoggerFactory.getLogger(CvsCommandExecutor.class);

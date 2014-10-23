@@ -59,7 +59,8 @@ public class CvsBlameCommand extends BlameCommand {
       try {
         boolean isSuccess = commandExecutor.processCommand(args.toArray(new String[args.size()]), config.baseDir(), fs.baseDir(), consumer);
         if (!isSuccess) {
-          throw new IllegalStateException("The CVS annotate command [cvs " + Joiner.on(' ').join(args) + "] failed");
+          throw new IllegalStateException("The CVS annotate command [cvs " + Joiner.on(' ').join(args) + "] failed.\n\nStdout:\n" + consumer.getStdout() + "\n\nStderr:\n"
+            + consumer.getStderr());
         }
       } catch (CommandException e) {
         throw new IllegalStateException("The CVS annotate command [cvs " + Joiner.on(' ').join(args) + "] failed", e.getUnderlyingException());

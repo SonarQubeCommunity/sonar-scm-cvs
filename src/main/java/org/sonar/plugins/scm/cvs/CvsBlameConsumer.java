@@ -46,6 +46,9 @@ public class CvsBlameConsumer extends CVSAdapter {
   private DateFormat format;
   private String filename;
 
+  private StringBuilder stdout = new StringBuilder();
+  private StringBuilder stderr = new StringBuilder();
+
   public CvsBlameConsumer(String filename) {
     this.filename = filename;
     this.format = new SimpleDateFormat(CVS_TIMESTAMP_PATTERN, Locale.US);
@@ -74,8 +77,9 @@ public class CvsBlameConsumer extends CVSAdapter {
 
   private void consume(boolean isError, String message) {
     if (isError) {
-      throw new IllegalStateException(message);
+      stderr.append(message).append("\n");
     } else {
+      stdout.append(message).append("\n");
       consumeLine(message);
     }
   }
@@ -110,5 +114,13 @@ public class CvsBlameConsumer extends CVSAdapter {
     } catch (ParseException e) {
       throw new IllegalStateException("Unable to parse date " + date, e);
     }
+  }
+
+  public StringBuilder getStdout() {
+    return stdout;
+  }
+
+  public StringBuilder getStderr() {
+    return stderr;
   }
 }
