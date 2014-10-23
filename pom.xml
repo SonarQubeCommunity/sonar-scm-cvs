@@ -6,9 +6,9 @@
     <artifactId>parent</artifactId>
     <version>18</version>
   </parent>
-  <artifactId>sonar-cvs-plugin</artifactId>
+  <artifactId>sonar-scm-cvs-plugin</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>SonarQube :: Plugins :: CVS</name>
+  <name>SonarQube :: Plugins :: SCM :: CVS</name>
   <packaging>sonar-plugin</packaging>
   <description>CVS SCM Provider.</description>
 

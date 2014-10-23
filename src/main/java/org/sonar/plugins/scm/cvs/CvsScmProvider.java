@@ -1,5 +1,5 @@
 /*
- * SonarQube :: Plugins :: CVS
+ * SonarQube :: Plugins :: SCM :: CVS
  * Copyright (C) 2009 ${owner}
  * dev@sonar.codehaus.org
  *
