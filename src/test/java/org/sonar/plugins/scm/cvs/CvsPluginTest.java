@@ -27,6 +27,6 @@ public class CvsPluginTest {
 
   @Test
   public void getExtensions() {
-    assertThat(new CvsPlugin().getExtensions()).hasSize(12);
+    assertThat(new CvsPlugin().getExtensions()).hasSize(11);
   }
 }

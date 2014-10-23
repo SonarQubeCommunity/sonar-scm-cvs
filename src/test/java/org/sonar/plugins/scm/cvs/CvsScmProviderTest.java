@@ -23,7 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.sonar.api.config.Settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,19 +38,17 @@ public class CvsScmProviderTest {
 
   @Test
   public void sanityCheck() {
-    assertThat(new CvsScmProvider(null, null).key()).isEqualTo("cvs");
+    assertThat(new CvsScmProvider(null).key()).isEqualTo("cvs");
   }
 
   @Test
   public void testAutodetection() throws IOException {
     File baseDirEmpty = temp.newFolder();
-    assertThat(new CvsScmProvider(null, null).supports(baseDirEmpty)).isFalse();
+    assertThat(new CvsScmProvider(null).supports(baseDirEmpty)).isFalse();
 
     File cvsBaseDir = temp.newFolder();
     new File(cvsBaseDir, "CVS").mkdir();
-    assertThat(new CvsScmProvider(null, new CvsConfiguration(new Settings())).supports(cvsBaseDir)).isTrue();
-
-    assertThat(new CvsScmProvider(null, new CvsConfiguration(new Settings())).supports(new File(cvsBaseDir, "subdir"))).isTrue();
+    assertThat(new CvsScmProvider(null).supports(cvsBaseDir)).isTrue();
   }
 
 }

@@ -28,7 +28,6 @@ import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.commandLine.CommandFactory;
-import org.netbeans.lib.cvsclient.commandLine.GetOpt;
 import org.netbeans.lib.cvsclient.connection.AbstractConnection;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
@@ -42,11 +41,7 @@ import org.sonar.api.BatchComponent;
 import org.sonar.api.batch.InstantiationStrategy;
 import org.sonar.api.utils.System2;
 
-import javax.annotation.Nullable;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
 /**
@@ -86,51 +81,27 @@ public class CvsCommandExecutor implements BatchComponent {
    * @throws AuthenticationException 
    * @throws CommandException 
    */
-  public boolean processCommand(String[] args, @Nullable File cvsBaseDir, File projectBaseDir, CVSListener listener) throws AuthenticationException, CommandException {
-    // Set up the CVSRoot. Note that it might still be null after this
-    // call if the user has decided to set it with the -d command line global option
-    GlobalOptions globalOptions = new GlobalOptions();
-    if (cvsBaseDir != null) {
-      globalOptions.setCVSRoot(getCVSRoot(cvsBaseDir));
-    }
-
-    // Set up any global options specified. These occur before thename of the command to run
-    int commandIndex;
-
-    try {
-      commandIndex = processGlobalOptions(args, globalOptions);
-    } catch (IllegalArgumentException e) {
-      throw new IllegalStateException("Invalid argument: " + e);
-    }
+  public boolean processCommand(String command, GlobalOptions globalOptions, String[] args, File workingDir, CVSListener listener)
+    throws AuthenticationException, CommandException {
 
     // if we don't have a CVS root by now, the user has messed up
     if (globalOptions.getCVSRoot() == null) {
       throw new IllegalStateException("No CVS root is set. Please set " + CvsConfiguration.CVS_ROOT_PROP_KEY + ".");
     }
 
-    // parse the CVS root into its constituent parts
-    CVSRoot root;
     final String cvsRoot = globalOptions.getCVSRoot();
-    try {
-      root = CVSRoot.parse(cvsRoot);
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Incorrect format for CVSRoot: " + cvsRoot + "\nThe correct format is: "
-        + "[:method:][[user][:password]@][hostname:[port]]/path/to/repository"
-        + "\nwhere \"method\" is pserver.", e);
-    }
+    CVSRoot root = parseCvsRoot(cvsRoot);
 
-    final String command = args[commandIndex];
+    org.netbeans.lib.cvsclient.command.Command c = CommandFactory.getDefault().createCommand(command, args, 0, globalOptions, workingDir.getAbsolutePath());
 
-    // this is not login, but a 'real' cvs command, so construct it,
-    // set the options, and then connect to the server and execute it
+    String password = getPassword(cvsRoot, root);
+    connect(workingDir, root, password);
+    client.getEventManager().addCVSListener(listener);
+    LOG.debug("Executing CVS command: " + c.getCVSCommand());
+    return client.executeCommand(c, globalOptions);
+  }
 
-    org.netbeans.lib.cvsclient.command.Command c;
-    try {
-      c = CommandFactory.getDefault().createCommand(command, args, ++commandIndex, globalOptions, cvsBaseDir.getAbsolutePath());
-    } catch (IllegalArgumentException e) {
-      throw new IllegalStateException("Illegal argument: " + e.getMessage(), e);
-    }
-
+  private String getPassword(final String cvsRoot, CVSRoot root) {
     String password = null;
 
     if (CVSRoot.METHOD_PSERVER.equals(root.getMethod())) {
@@ -145,10 +116,22 @@ public class CvsCommandExecutor implements BatchComponent {
         }
       }
     }
-    connect(projectBaseDir, root, password);
-    client.getEventManager().addCVSListener(listener);
-    LOG.debug("Executing CVS command: " + c.getCVSCommand());
-    return client.executeCommand(c, globalOptions);
+    return password;
+  }
+
+  /**
+   * parse the CVS root into its constituent parts
+   */
+  private CVSRoot parseCvsRoot(final String cvsRoot) {
+    CVSRoot root;
+    try {
+      root = CVSRoot.parse(cvsRoot);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Incorrect format for CVSRoot: " + cvsRoot + "\nThe correct format is: "
+        + "[:method:][[user][:password]@][hostname:[port]]/path/to/repository"
+        + "\nwhere \"method\" is pserver.", e);
+    }
+    return root;
   }
 
   /**
@@ -161,23 +144,13 @@ public class CvsCommandExecutor implements BatchComponent {
   private static String lookupPassword(String cvsRoot) {
     File passFile = new File(System.getProperty("cygwin.user.home", System.getProperty("user.home")) + File.separatorChar + ".cvspass");
 
-    BufferedReader reader = null;
     String password = null;
 
     try {
-      reader = new BufferedReader(new FileReader(passFile));
-      password = processCvspass(cvsRoot, reader);
+      password = processCvspass(cvsRoot, passFile);
     } catch (IOException e) {
       LOG.warn("Could not read password for '" + cvsRoot + "' from '" + passFile + "'", e);
       return null;
-    } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException e) {
-          LOG.error("Warning: could not close password file.");
-        }
-      }
     }
     if (password == null) {
       LOG.error("Didn't find password for CVSROOT '" + cvsRoot + "'.");
@@ -194,10 +167,9 @@ public class CvsCommandExecutor implements BatchComponent {
    * @return The password, or null if it can't be found.
    * @throws IOException
    */
-  private static String processCvspass(String cvsRoot, BufferedReader reader) throws IOException {
-    String line;
+  private static String processCvspass(String cvsRoot, File cvspassFile) throws IOException {
     String password = null;
-    while ((line = reader.readLine()) != null) {
+    for (String line : FileUtils.readLines(cvspassFile)) {
       if (line.startsWith("/")) {
         String[] cvspass = StringUtils.split(line, " ");
         String cvspassRoot = cvspass[1];
@@ -251,12 +223,7 @@ public class CvsCommandExecutor implements BatchComponent {
         if (cvsRsh.indexOf(' ') < 0) {
           // cvs_rsh should be 'rsh' or 'ssh'
           // Complete the command to use
-          String username = root.getUserName();
-          if (username == null) {
-            username = System.getProperty("user.name");
-          }
-
-          cvsRsh += " " + username + "@" + root.getHostName() + " cvs server";
+          cvsRsh += " " + root.getUserName() + "@" + root.getHostName() + " cvs server";
         }
 
         AbstractConnection conn = new org.netbeans.lib.cvsclient.connection.ExtConnection(cvsRsh);
@@ -285,46 +252,6 @@ public class CvsCommandExecutor implements BatchComponent {
         throw new IllegalStateException("Unable to disconnect", e);
       }
     }
-  }
-
-  /**
-   * Obtain the CVS root from the CVS directory
-   *
-   * @return the CVSRoot string
-   */
-  private static String getCVSRoot(File cvsBaseDir) {
-    File f = cvsBaseDir;
-    File rootFile = new File(f, "CVS/Root");
-    try {
-      return FileUtils.readFileToString(rootFile).trim().substring(1);
-    } catch (IOException e) {
-      throw new IllegalStateException("Can't read " + rootFile.getAbsolutePath());
-    }
-  }
-
-  /**
-   * Process global options passed into the application
-   *
-   * @param args          the argument list, complete
-   * @param globalOptions the global options structure that will be passed to
-   *                      the command
-   */
-  private static int processGlobalOptions(String[] args, GlobalOptions globalOptions)
-  {
-    final String getOptString = globalOptions.getOptString();
-    GetOpt go = new GetOpt(args, getOptString);
-    int ch;
-    while ((ch = go.getopt()) != GetOpt.optEOF)
-    {
-      String arg = go.optArgGet();
-      boolean success = globalOptions.setCVSCommand((char) ch, arg);
-      if (!success)
-      {
-        throw new IllegalArgumentException("Failed to set CVS Command: -" + ch + " = " + arg);
-      }
-    }
-
-    return go.optIndexGet();
   }
 
 }

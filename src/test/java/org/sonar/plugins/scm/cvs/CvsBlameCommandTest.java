@@ -29,6 +29,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.netbeans.lib.cvsclient.command.CommandException;
+import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.event.CVSListener;
 import org.netbeans.lib.cvsclient.event.MessageEvent;
@@ -51,6 +52,7 @@ import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,6 +76,9 @@ public class CvsBlameCommandTest {
     fs.setBaseDir(baseDir);
     input = mock(BlameInput.class);
     when(input.fileSystem()).thenReturn(fs);
+
+    File cvsRoot = new File(baseDir, "CVS/Root");
+    FileUtils.write(cvsRoot, ":pserver:bar");
   }
 
   @Test
@@ -92,11 +97,11 @@ public class CvsBlameCommandTest {
     BlameOutput result = mock(BlameOutput.class);
     CvsCommandExecutor commandExecutor = mock(CvsCommandExecutor.class);
 
-    when(commandExecutor.processCommand(any(String[].class), any(File.class), any(File.class), any(CVSListener.class))).thenAnswer(new Answer<Boolean>() {
+    when(commandExecutor.processCommand(eq("annotate"), any(GlobalOptions.class), any(String[].class), any(File.class), any(CVSListener.class))).thenAnswer(new Answer<Boolean>() {
 
       @Override
       public Boolean answer(InvocationOnMock invocation) throws Throwable {
-        CVSListener listener = (CVSListener) invocation.getArguments()[3];
+        CVSListener listener = (CVSListener) invocation.getArguments()[4];
         List<String> lines = IOUtils.readLines(getClass().getResourceAsStream("/annotate.xml"), "UTF-8");
         for (String line : lines) {
           listener.messageSent(new MessageEvent("", line, false));
@@ -131,7 +136,43 @@ public class CvsBlameCommandTest {
   }
 
   @Test
-  public void testAllParams() throws IOException {
+  public void testUnknowError() throws IOException, AuthenticationException, CommandException {
+    File source = new File(baseDir, "src/foo.xoo");
+    FileUtils.write(source, "sample content");
+    DefaultInputFile inputFile = new DefaultInputFile("foo", "src/foo.xoo")
+      .setAbsolutePath(new File(baseDir, "src/foo.xoo").getAbsolutePath())
+      .setLines(7);
+    fs.add(inputFile);
+
+    BlameOutput result = mock(BlameOutput.class);
+    CvsCommandExecutor commandExecutor = mock(CvsCommandExecutor.class);
+
+    when(commandExecutor.processCommand(eq("annotate"), any(GlobalOptions.class), any(String[].class), any(File.class), any(CVSListener.class))).thenAnswer(new Answer<Boolean>() {
+
+      @Override
+      public Boolean answer(InvocationOnMock invocation) throws Throwable {
+        CVSListener listener = (CVSListener) invocation.getArguments()[4];
+        listener.messageSent(new MessageEvent("", "Unknow error", true));
+        return false;
+      }
+    });
+
+    when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile));
+    File tempFile = temp.newFile("cvs");
+    TempFolder tempFolder = mock(TempFolder.class);
+    when(tempFolder.newDir("cvs")).thenReturn(tempFile);
+
+    thrown.expect(IllegalStateException.class);
+    thrown
+      .expectMessage("The CVS annotate command [cvs -Q -f -T " + tempFile.getAbsolutePath()
+        + " annotate src/foo.xoo] failed.");
+    thrown.expectMessage("Unknow error");
+
+    new CvsBlameCommand(mock(CvsConfiguration.class), tempFolder, commandExecutor).blame(input, result);
+  }
+
+  @Test
+  public void testAnnotateParams() throws IOException {
     DefaultInputFile inputFile = new DefaultInputFile("foo", "src/foo.xoo")
       .setAbsolutePath(new File(baseDir, "src/foo.xoo").getAbsolutePath())
       .setLines(7);
@@ -143,21 +184,38 @@ public class CvsBlameCommandTest {
     when(tempFolder.newDir("cvs")).thenReturn(tmp);
     CvsBlameCommand cvsBlameCommand = new CvsBlameCommand(new CvsConfiguration(settings), tempFolder, commandExecutor);
 
-    assertThat(cvsBlameCommand.buildAnnotateArguments(inputFile)).containsExactly("-z3", "-f", "-T", tmp.getAbsolutePath(), "-q", "annotate",
-      "src/foo.xoo");
+    assertThat(cvsBlameCommand.buildAnnotateArguments(inputFile)).containsExactly("src/foo.xoo");
 
-    settings.setProperty(CvsConfiguration.TRACE_PROP_KEY, "true");
+    settings.setProperty(CvsConfiguration.REV_PROP_KEY, "my-branch");
+    assertThat(cvsBlameCommand.buildAnnotateArguments(inputFile)).containsExactly("-r", "my-branch", "src/foo.xoo");
+  }
+
+  @Test
+  public void testGlobalOptions() throws IOException {
+    CvsCommandExecutor commandExecutor = mock(CvsCommandExecutor.class);
+    Settings settings = new Settings(new PropertyDefinitions(CvsConfiguration.getProperties()));
+    TempFolder tempFolder = mock(TempFolder.class);
+    File tmp = new File("tmpcvs");
+    when(tempFolder.newDir("cvs")).thenReturn(tmp);
+    CvsConfiguration config = new CvsConfiguration(settings);
+    CvsBlameCommand cvsBlameCommand = new CvsBlameCommand(config, tempFolder, commandExecutor);
+
+    GlobalOptions globalOptions = cvsBlameCommand.buildGlobalOptions(baseDir);
+    assertThat(globalOptions.getCompressionLevel()).isEqualTo(3);
+    assertThat(globalOptions.isIgnoreCvsrc()).isTrue();
+    assertThat(globalOptions.getTempDir()).isEqualTo(tmp);
+    assertThat(globalOptions.getCVSRoot()).isEqualTo(":pserver:bar");
+
     settings.setProperty(CvsConfiguration.USE_CVSRC_PROP_KEY, "true");
     settings.setProperty(CvsConfiguration.CVS_ROOT_PROP_KEY, ":pserver:foo");
-    settings.setProperty(CvsConfiguration.REV_PROP_KEY, "my-branch");
     settings.setProperty(CvsConfiguration.DISABLE_COMPRESSION_PROP_KEY, "true");
-    assertThat(cvsBlameCommand.buildAnnotateArguments(inputFile)).containsExactly("-t", "-T", tmp.getAbsolutePath(), "-d", ":pserver:foo", "-r", "my-branch", "-q",
-      "annotate",
-      "src/foo.xoo");
+    globalOptions = cvsBlameCommand.buildGlobalOptions(baseDir);
+    assertThat(globalOptions.getCompressionLevel()).isEqualTo(0);
+    assertThat(globalOptions.getCVSRoot()).isEqualTo(":pserver:foo");
+    assertThat(globalOptions.isIgnoreCvsrc()).isFalse();
     settings.setProperty(CvsConfiguration.DISABLE_COMPRESSION_PROP_KEY, "false");
     settings.setProperty(CvsConfiguration.COMPRESSION_LEVEL_PROP_KEY, "4");
-    assertThat(cvsBlameCommand.buildAnnotateArguments(inputFile)).containsExactly("-z4", "-t", "-T", tmp.getAbsolutePath(), "-d", ":pserver:foo", "-r", "my-branch", "-q",
-      "annotate",
-      "src/foo.xoo");
+    globalOptions = cvsBlameCommand.buildGlobalOptions(baseDir);
+    assertThat(globalOptions.getCompressionLevel()).isEqualTo(4);
   }
 }

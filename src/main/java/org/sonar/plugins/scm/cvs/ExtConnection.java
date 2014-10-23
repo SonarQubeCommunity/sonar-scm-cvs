@@ -29,6 +29,8 @@ import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.ConnectionModifier;
 import org.netbeans.lib.cvsclient.util.LoggedDataInputStream;
 import org.netbeans.lib.cvsclient.util.LoggedDataOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,11 +43,14 @@ import java.io.InputStreamReader;
  * Provides support for the :ext: connection method.
  */
 public class ExtConnection extends AbstractConnection {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ExtConnection.class);
+
   private String host;
 
   private int port;
 
-  private String userName;
+  private String username;
 
   private String password;
 
@@ -60,10 +65,7 @@ public class ExtConnection extends AbstractConnection {
   }
 
   public ExtConnection(String host, int port, String username, String password, String repository) {
-    this.userName = username;
-    if (this.userName == null) {
-      this.userName = System.getProperty("user.name");
-    }
+    this.username = username;
     this.password = password;
     this.host = host;
     setRepository(repository);
@@ -76,15 +78,7 @@ public class ExtConnection extends AbstractConnection {
   public void open() throws AuthenticationException, CommandAbortedException {
     connection = new Connection(host, port);
 
-    /*
-     * TODO: add proxy support
-     * ProxyData proxy = new HTTPProxyData( proxyHost, proxyPort, proxyUserName, proxyPassword );
-     * 
-     * connection.setProxyData( proxy );
-     */
-
     try {
-      // TODO: connection timeout?
       connection.connect();
     } catch (IOException e) {
       String message = "Cannot connect. Reason: " + e.getMessage();
@@ -96,9 +90,9 @@ public class ExtConnection extends AbstractConnection {
     try {
       boolean authenticated;
       if (privateKey != null && privateKey.exists()) {
-        authenticated = connection.authenticateWithPublicKey(userName, privateKey, getPassphrase());
+        authenticated = connection.authenticateWithPublicKey(username, privateKey, getPassphrase());
       } else {
-        authenticated = connection.authenticateWithPassword(userName, password);
+        authenticated = connection.authenticateWithPassword(username, password);
       }
 
       if (!authenticated) {
@@ -153,7 +147,7 @@ public class ExtConnection extends AbstractConnection {
             break;
           }
 
-          System.err.println(line);
+          LOG.warn(line);
         }
       }
     } catch (IOException e) {
@@ -161,7 +155,7 @@ public class ExtConnection extends AbstractConnection {
     }
 
     if (session != null) {
-      System.out.println("Exit code:" + session.getExitStatus().intValue());
+      LOG.debug("ExtConnection exit code:" + session.getExitStatus().intValue());
       session.close();
     }
 

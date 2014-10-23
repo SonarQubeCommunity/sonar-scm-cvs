@@ -27,11 +27,9 @@ import java.io.File;
 public class CvsScmProvider extends ScmProvider {
 
   private final CvsBlameCommand blameCommand;
-  private final CvsConfiguration config;
 
-  public CvsScmProvider(CvsBlameCommand blameCommand, CvsConfiguration config) {
+  public CvsScmProvider(CvsBlameCommand blameCommand) {
     this.blameCommand = blameCommand;
-    this.config = config;
   }
 
   @Override
@@ -42,15 +40,7 @@ public class CvsScmProvider extends ScmProvider {
   @Override
   public boolean supports(File baseDir) {
     File cvsDir = new File(baseDir, "CVS");
-    if (cvsDir.exists() && cvsDir.isDirectory()) {
-      config.setBaseDir(baseDir);
-      return true;
-    }
-    if (baseDir.getParentFile() != null) {
-      return supports(baseDir.getParentFile());
-    } else {
-      return false;
-    }
+    return cvsDir.exists() && cvsDir.isDirectory();
   }
 
   @Override
