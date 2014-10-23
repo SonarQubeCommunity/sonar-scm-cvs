@@ -97,7 +97,7 @@ public class SshConnection extends AbstractConnection {
     try {
       channel = (ChannelExec) sesConnection.openChannel("exec");
       channel.setCommand("cvs server");
-      channel.connect();
+      channel.connect(60 * 1000);
 
       setInputStream(new LoggedDataInputStream(channel.getInputStream()));
       setOutputStream(new LoggedDataOutputStream(channel.getOutputStream()));
