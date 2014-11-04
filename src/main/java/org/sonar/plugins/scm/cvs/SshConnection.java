@@ -30,19 +30,14 @@ import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.ConnectionModifier;
 import org.netbeans.lib.cvsclient.util.LoggedDataInputStream;
 import org.netbeans.lib.cvsclient.util.LoggedDataOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * Provides support for the :ext: connection method.
  */
 public class SshConnection extends AbstractConnection {
-
-  private static final Logger LOG = LoggerFactory.getLogger(SshConnection.class);
 
   private String host;
 
@@ -72,6 +67,7 @@ public class SshConnection extends AbstractConnection {
     }
   }
 
+  @Override
   public void open() throws AuthenticationException, CommandAbortedException {
     jschSSHChannel = new JSch();
     try {
@@ -138,22 +134,27 @@ public class SshConnection extends AbstractConnection {
     setOutputStream(null);
   }
 
+  @Override
   public void close() throws IOException {
     closeConnection();
   }
 
+  @Override
   public boolean isOpen() {
     return sesConnection != null;
   }
 
+  @Override
   public int getPort() {
     return port;
   }
 
+  @Override
   public void modifyInputStream(ConnectionModifier modifier) throws IOException {
     modifier.modifyInputStream(getInputStream());
   }
 
+  @Override
   public void modifyOutputStream(ConnectionModifier modifier) throws IOException {
     modifier.modifyOutputStream(getOutputStream());
   }
