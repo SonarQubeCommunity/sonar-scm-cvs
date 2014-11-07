@@ -31,6 +31,8 @@ import org.netbeans.lib.cvsclient.connection.ConnectionModifier;
 import org.netbeans.lib.cvsclient.util.LoggedDataInputStream;
 import org.netbeans.lib.cvsclient.util.LoggedDataOutputStream;
 
+import javax.annotation.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -55,7 +57,7 @@ public class SshConnection extends AbstractConnection {
 
   private String passphrase;
 
-  public SshConnection(String host, int port, String username, String password, String passphrase, String repository) {
+  public SshConnection(String host, int port, @Nullable String username, @Nullable String password, @Nullable String passphrase, String repository) {
     this.username = username;
     this.password = password;
     this.host = host;

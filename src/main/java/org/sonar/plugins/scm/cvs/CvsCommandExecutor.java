@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.BatchComponent;
 import org.sonar.api.batch.InstantiationStrategy;
 
+import javax.annotation.CheckForNull;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -101,6 +103,7 @@ public class CvsCommandExecutor implements BatchComponent {
   /**
    * Password will be scrambled for pserver method
    */
+  @CheckForNull
   private String getPassword(final String cvsRoot, CVSRoot root) {
     String password;
     if (config.password() != null) {
@@ -121,6 +124,7 @@ public class CvsCommandExecutor implements BatchComponent {
     }
   }
 
+  @CheckForNull
   private String getUsername(CVSRoot root) {
     if (config.username() != null) {
       return config.username();
