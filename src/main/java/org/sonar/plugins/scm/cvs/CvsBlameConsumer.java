@@ -112,7 +112,7 @@ public class CvsBlameConsumer extends CVSAdapter {
     try {
       return format.parse(date);
     } catch (ParseException e) {
-      throw new IllegalStateException("Unable to parse date " + date, e);
+      throw new IllegalStateException("Unable to parse date " + date + " in blame of file " + filename, e);
     }
   }
 

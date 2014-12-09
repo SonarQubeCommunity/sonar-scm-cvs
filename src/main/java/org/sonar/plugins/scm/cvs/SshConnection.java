@@ -106,6 +106,7 @@ public class SshConnection extends AbstractConnection {
     }
   }
 
+  @Override
   public void verify() throws AuthenticationException {
     try {
       open();
