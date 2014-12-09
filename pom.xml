@@ -11,6 +11,46 @@
   <name>SonarQube :: Plugins :: SCM :: CVS</name>
   <packaging>sonar-plugin</packaging>
   <description>CVS SCM Provider.</description>
+  <url>TODO</url>
+  <inceptionYear>2014</inceptionYear>
+
+  <organization>
+    <name>SonarSource</name>
+    <url>http://www.sonarsource.com</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>GNU LGPL 3</name>
+      <url>http://www.gnu.org/licenses/lgpl.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>henryju</id>
+      <name>Julien Henry</name>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git@github.com:SonarCommunity/sonar-scm-cvs.git</connection>
+    <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-scm-cvs.git</developerConnection>
+    <url>https://github.com/SonarCommunity/sonar-scm-cvs</url>
+    <tag>HEAD</tag>
+  </scm>
+  
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.codehaus.org/browse/SONARSCCVS</url>
+  </issueManagement>
+  
+  <ciManagement>
+    <system>Cloudbees</system>
+    <url>TODO</url>
+  </ciManagement>
 
   <properties>
     <sonar.buildVersion>5.0-SNAPSHOT</sonar.buildVersion>
