@@ -11,7 +11,7 @@
   <name>SonarQube :: Plugins :: SCM :: CVS</name>
   <packaging>sonar-plugin</packaging>
   <description>CVS SCM Provider.</description>
-  <url>TODO</url>
+  <url>http://redirect.sonarsource.com/plugins/scmcvs.html</url>
   <inceptionYear>2014</inceptionYear>
 
   <organization>
@@ -39,7 +39,6 @@
     <connection>scm:git:git@github.com:SonarCommunity/sonar-scm-cvs.git</connection>
     <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-scm-cvs.git</developerConnection>
     <url>https://github.com/SonarCommunity/sonar-scm-cvs</url>
-    <tag>HEAD</tag>
   </scm>
   
   <issueManagement>
@@ -53,7 +52,7 @@
   </ciManagement>
 
   <properties>
-    <sonar.buildVersion>5.0-SNAPSHOT</sonar.buildVersion>
+    <sonar.buildVersion>5.0-RC3</sonar.buildVersion>
     <sonar.pluginName>CVS</sonar.pluginName>
     <sonar.pluginClass>org.sonar.plugins.scm.cvs.CvsPlugin</sonar.pluginClass>
   </properties>
