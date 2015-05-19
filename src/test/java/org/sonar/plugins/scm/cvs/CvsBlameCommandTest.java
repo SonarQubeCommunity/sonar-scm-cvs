@@ -60,6 +60,9 @@ import static org.mockito.Mockito.when;
 public class CvsBlameCommandTest {
 
   @Rule
+  public UTCRule utcRule = new UTCRule();
+
+  @Rule
   public TemporaryFolder temp = new TemporaryFolder();
 
   @Rule
@@ -115,24 +118,24 @@ public class CvsBlameCommandTest {
     new CvsBlameCommand(mock(CvsConfiguration.class), new DefaultTempFolder(temp.newFolder()), commandExecutor).blame(input, result);
     verify(result).blameResult(inputFile1,
       Arrays.asList(
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.2").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien")));
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.2").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien")));
 
     verify(result).blameResult(inputFile2,
       Arrays.asList(
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.2").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0200")).revision("1.1").author("julien")));
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.2").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-10-21T00:00:00+0000")).revision("1.1").author("julien")));
   }
 
   @Test
@@ -164,7 +167,7 @@ public class CvsBlameCommandTest {
 
     thrown.expect(IllegalStateException.class);
     thrown
-      .expectMessage("The CVS annotate command [cvs -d :pserver:bar -Q -f -T " + tempFile.getAbsolutePath()
+      .expectMessage("The CVS annotate command [cvs -d :pserver:bar -t -f -T " + tempFile.getAbsolutePath()
         + " annotate src/foo.xoo] failed.");
     thrown.expectMessage("Unknow error");
 
