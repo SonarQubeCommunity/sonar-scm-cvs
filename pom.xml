@@ -36,9 +36,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:SonarCommunity/sonar-scm-cvs.git</connection>
-    <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-scm-cvs.git</developerConnection>
-    <url>https://github.com/SonarCommunity/sonar-scm-cvs</url>
+    <connection>scm:git:git@github.com:SonarSource/sonar-scm-cvs.git</connection>
+    <developerConnection>scm:git:git@github.com:SonarSource/sonar-scm-cvs.git</developerConnection>
+    <url>https://github.com/SonarSource/sonar-scm-cvs</url>
     <tag>HEAD</tag>
   </scm>
   
