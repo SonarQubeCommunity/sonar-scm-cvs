@@ -1,6 +1,6 @@
 # CVS Plugin
 
-[![Build Status](https://travis-ci.org/SonarCommunity/sonar-scm-cvs.svg?branch=master)](https://travis-ci.org/SonarCommunity/sonar-scm-cvs)
+[![Build Status](https://travis-ci.org/SonarSource/sonar-scm-cvs.svg?branch=master)](https://travis-ci.org/SonarSource/sonar-scm-cvs)
 
 Download and Versions information: http://update.sonarsource.org/plugins/scmcvs-confluence.html
 
