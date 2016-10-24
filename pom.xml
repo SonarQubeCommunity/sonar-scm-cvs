@@ -58,6 +58,8 @@
     <sonar.pluginName>CVS</sonar.pluginName>
     <sonar.pluginClass>org.sonar.plugins.scm.cvs.CvsPlugin</sonar.pluginClass>
     <gitRepositoryName>sonar-scm-cvs</gitRepositoryName>
+    <!-- Release: enable publication to Bintray -->
+    <artifactsToPublish>${project.groupId}:${project.artifactId}:jar</artifactsToPublish>
   </properties>
 
   <dependencies>
