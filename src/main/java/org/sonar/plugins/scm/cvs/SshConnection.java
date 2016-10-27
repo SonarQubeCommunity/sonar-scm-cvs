@@ -23,6 +23,9 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import java.io.File;
+import java.io.IOException;
+import javax.annotation.Nullable;
 import org.apache.commons.lang.StringUtils;
 import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.connection.AbstractConnection;
@@ -30,11 +33,6 @@ import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.ConnectionModifier;
 import org.netbeans.lib.cvsclient.util.LoggedDataInputStream;
 import org.netbeans.lib.cvsclient.util.LoggedDataOutputStream;
-
-import javax.annotation.Nullable;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Provides support for the :ext: connection method.
@@ -48,8 +46,6 @@ public class SshConnection extends AbstractConnection {
   private String username;
 
   private String password;
-
-  private JSch jschSSHChannel;
 
   private Session sesConnection;
 
@@ -71,12 +67,12 @@ public class SshConnection extends AbstractConnection {
 
   @Override
   public void open() throws AuthenticationException, CommandAbortedException {
-    jschSSHChannel = new JSch();
+    JSch jschSSHChannel = new JSch();
     try {
       if (password == null) {
         // If user don't define a password, he wants to use a private key
         File privateKey = findPrivateKey();
-        if (privateKey != null && privateKey.exists()) {
+        if (privateKey.exists()) {
           jschSSHChannel.addIdentity(privateKey.getAbsolutePath(), StringUtils.trimToEmpty(passphrase));
         }
       }
