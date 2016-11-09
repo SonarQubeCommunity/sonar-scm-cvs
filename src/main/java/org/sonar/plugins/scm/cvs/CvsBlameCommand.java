@@ -20,6 +20,10 @@
 package org.sonar.plugins.scm.cvs;
 
 import com.google.common.base.Joiner;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
@@ -31,11 +35,6 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.scm.BlameCommand;
 import org.sonar.api.batch.scm.BlameLine;
 import org.sonar.api.utils.TempFolder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CvsBlameCommand extends BlameCommand {
 
@@ -85,7 +84,7 @@ public class CvsBlameCommand extends BlameCommand {
     }
   }
 
-  private String commandToString(GlobalOptions globalOptions, List<String> args) {
+  private static String commandToString(GlobalOptions globalOptions, List<String> args) {
     StringBuilder sb = new StringBuilder();
     sb.append("cvs ");
     if (globalOptions.getCVSRoot() != null) {
@@ -139,7 +138,7 @@ public class CvsBlameCommand extends BlameCommand {
 
   List<String> buildAnnotateArguments(InputFile inputFile) {
 
-    List<String> args = new ArrayList<String>();
+    List<String> args = new ArrayList<>();
 
     if (config.revision() != null) {
       args.add("-r");

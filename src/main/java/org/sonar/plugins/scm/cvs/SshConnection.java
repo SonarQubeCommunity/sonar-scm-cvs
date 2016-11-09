@@ -95,9 +95,7 @@ public class SshConnection extends AbstractConnection {
 
       setInputStream(new LoggedDataInputStream(channel.getInputStream()));
       setOutputStream(new LoggedDataOutputStream(channel.getOutputStream()));
-    } catch (JSchException e) {
-      throw new IllegalStateException(e.getMessage(), e);
-    } catch (IOException e) {
+    } catch (JSchException | IOException e) {
       throw new IllegalStateException(e.getMessage(), e);
     }
   }
@@ -158,7 +156,7 @@ public class SshConnection extends AbstractConnection {
     modifier.modifyOutputStream(getOutputStream());
   }
 
-  private File findPrivateKey() {
+  private static File findPrivateKey() {
     File privateKey = new File(System.getProperty("user.home"), ".ssh/id_dsa");
     if (!privateKey.exists()) {
       privateKey = new File(System.getProperty("user.home"), ".ssh/id_rsa");

@@ -19,10 +19,6 @@
  */
 package org.sonar.plugins.scm.cvs;
 
-import org.netbeans.lib.cvsclient.event.CVSAdapter;
-import org.netbeans.lib.cvsclient.event.MessageEvent;
-import org.sonar.api.batch.scm.BlameLine;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,6 +28,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
+import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import org.netbeans.lib.cvsclient.event.MessageEvent;
+import org.sonar.api.batch.scm.BlameLine;
 
 public class CvsBlameConsumer extends CVSAdapter {
 
@@ -41,7 +41,7 @@ public class CvsBlameConsumer extends CVSAdapter {
   private static final Pattern LINE_PATTERN = Pattern.compile("(.*)\\((.*)\\s+(.*)\\)");
 
   private final StringBuffer taggedLine = new StringBuffer();
-  private List<BlameLine> lines = new ArrayList<BlameLine>();
+  private List<BlameLine> lines = new ArrayList<>();
 
   private DateFormat format;
   private String filename;
@@ -84,7 +84,7 @@ public class CvsBlameConsumer extends CVSAdapter {
     }
   }
 
-  private void consumeLine(String line) {
+  private void consumeLine(@Nullable String line) {
     if (line != null && line.indexOf(':') > 0) {
       String annotation = line.substring(0, line.indexOf(':'));
       Matcher matcher = LINE_PATTERN.matcher(annotation);

@@ -19,6 +19,9 @@
  */
 package org.sonar.plugins.scm.cvs;
 
+import java.io.File;
+import java.io.IOException;
+import javax.annotation.CheckForNull;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
@@ -36,11 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.BatchComponent;
 import org.sonar.api.batch.InstantiationStrategy;
-
-import javax.annotation.CheckForNull;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Highly inspired from Maven SCM CVS provider
@@ -135,7 +133,7 @@ public class CvsCommandExecutor implements BatchComponent {
   /**
    * parse the CVS root into its constituent parts
    */
-  private CVSRoot parseCvsRoot(final String cvsRoot) {
+  private static CVSRoot parseCvsRoot(final String cvsRoot) {
     CVSRoot root;
     try {
       root = CVSRoot.parse(cvsRoot);
