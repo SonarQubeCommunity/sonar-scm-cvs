@@ -8,10 +8,6 @@ jdk:
 script:
   - ./travis.sh
 
-env:
-  matrix:
-    - TARGET=CI
-
 cache:
   directories:
     - $HOME/.m2/repository
@@ -22,6 +18,7 @@ notifications:
   email: false
   webhooks:
     - secure: "JuS0GRec1OcF8p3d1GtD8NmAxm8b0rUyNWWqykaO3aiLj7l4LkNRilhsOGCAWi6V9DW89D0VAuDO3lZp7OSelRQaTpckpZsjQcaNb4+LisZNHKAyCyfNf5rJ1oL079L1mYJIRG2hKYVqS3OGYbcuIL2zThLzNnMXNda8R92bb/I="
+  on_start: always
 
 addons:
   apt:
