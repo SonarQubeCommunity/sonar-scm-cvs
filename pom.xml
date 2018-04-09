@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonarsource.parent</groupId>
     <artifactId>parent</artifactId>
-    <version>31</version>
+    <version>44</version>
   </parent>
   <groupId>org.sonarsource.scm.cvs</groupId>
   <artifactId>sonar-scm-cvs-plugin</artifactId>
@@ -45,12 +45,12 @@
   
   <issueManagement>
     <system>jira</system>
-    <url>http://jira.codehaus.org/browse/SONARSCCVS</url>
+    <url>https://jira.sonarsource.com/browse/SONARSCCVS</url>
   </issueManagement>
   
   <ciManagement>
-    <system>Cloudbees</system>
-    <url>https://sonarplugins.ci.cloudbees.com/job/scm-cvs/</url>
+    <system>TravisCI</system>
+    <url>https://travis-ci.org/SonarSource/sonar-scm-cvs</url>
   </ciManagement>
 
   <properties>
