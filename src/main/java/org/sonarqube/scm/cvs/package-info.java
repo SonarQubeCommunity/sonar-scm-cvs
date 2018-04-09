@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 @ParametersAreNonnullByDefault
-package org.sonar.plugins.scm.cvs;
+package org.sonarqube.scm.cvs;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
