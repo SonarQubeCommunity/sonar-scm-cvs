@@ -22,6 +22,7 @@ package org.sonarqube.scm.cvs;
 import java.io.File;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
@@ -88,7 +89,7 @@ public class CvsCommandExecutor {
     org.netbeans.lib.cvsclient.command.Command c = CommandFactory.getDefault().createCommand(command, args, 0, globalOptions, workingDir.getAbsolutePath());
 
     String username = getUsername(root);
-    String password = getPassword(cvsRoot, root);
+    String password = getPassword(root);
     try {
       connect(workingDir, root, username, password);
       client.getEventManager().addCVSListener(listener);
@@ -103,7 +104,7 @@ public class CvsCommandExecutor {
    * Password will be scrambled for pserver method
    */
   @CheckForNull
-  private String getPassword(final String cvsRoot, CVSRoot root) {
+  private String getPassword(CVSRoot root) {
     String password;
     if (config.password() != null) {
       password = config.password();
@@ -149,7 +150,7 @@ public class CvsCommandExecutor {
   /**
    * Creates the connection and the client and connects.
    */
-  private void connect(File baseDir, CVSRoot root, String username, String password) throws AuthenticationException, CommandAbortedException {
+  private void connect(File baseDir, CVSRoot root, @Nullable String username, @Nullable String password) throws AuthenticationException, CommandAbortedException {
     if (CVSRoot.METHOD_EXT.equals(root.getMethod())) {
       connection = new SshConnection(root.getHostName(), root.getPort(), username, password, config.passphrase(), root.getRepository());
     } else {
@@ -164,7 +165,7 @@ public class CvsCommandExecutor {
     client.setLocalPath(baseDir.getAbsolutePath());
   }
 
-  public void disconnect() {
+  private void disconnect() {
     if (connection != null && connection.isOpen()) {
       try {
         connection.close();
