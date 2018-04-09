@@ -26,8 +26,6 @@ import com.jcraft.jsch.Session;
 import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nullable;
-import org.apache.commons.lang.StringUtils;
-import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.connection.AbstractConnection;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.ConnectionModifier;
@@ -66,14 +64,14 @@ public class SshConnection extends AbstractConnection {
   }
 
   @Override
-  public void open() throws AuthenticationException, CommandAbortedException {
+  public void open() throws AuthenticationException {
     JSch jschSSHChannel = new JSch();
     try {
       if (password == null) {
         // If user don't define a password, he wants to use a private key
         File privateKey = findPrivateKey();
         if (privateKey.exists()) {
-          jschSSHChannel.addIdentity(privateKey.getAbsolutePath(), StringUtils.trimToEmpty(passphrase));
+          jschSSHChannel.addIdentity(privateKey.getAbsolutePath(), trimToEmpty(passphrase));
         }
       }
       sesConnection = jschSSHChannel.getSession(username, host, port);
@@ -132,7 +130,7 @@ public class SshConnection extends AbstractConnection {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     closeConnection();
   }
 
@@ -162,5 +160,9 @@ public class SshConnection extends AbstractConnection {
       privateKey = new File(System.getProperty("user.home"), ".ssh/id_rsa");
     }
     return privateKey;
+  }
+
+  private static String trimToEmpty(@Nullable String str) {
+    return str == null ? "" : str.trim();
   }
 }

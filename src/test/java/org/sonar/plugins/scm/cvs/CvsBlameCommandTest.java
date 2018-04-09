@@ -19,6 +19,10 @@
  */
 package org.sonar.plugins.scm.cvs;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -35,22 +39,17 @@ import org.netbeans.lib.cvsclient.event.CVSListener;
 import org.netbeans.lib.cvsclient.event.MessageEvent;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.DefaultFileSystem;
-import org.sonar.api.batch.fs.internal.DefaultInputFile;
+import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.batch.scm.BlameCommand.BlameInput;
 import org.sonar.api.batch.scm.BlameCommand.BlameOutput;
 import org.sonar.api.batch.scm.BlameLine;
 import org.sonar.api.config.PropertyDefinitions;
-import org.sonar.api.config.Settings;
+import org.sonar.api.config.internal.MapSettings;
 import org.sonar.api.utils.DateUtils;
 import org.sonar.api.utils.TempFolder;
 import org.sonar.api.utils.internal.DefaultTempFolder;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -75,8 +74,7 @@ public class CvsBlameCommandTest {
   @Before
   public void prepare() throws IOException {
     baseDir = temp.newFolder();
-    fs = new DefaultFileSystem();
-    fs.setBaseDir(baseDir);
+    fs = new DefaultFileSystem(baseDir);
     input = mock(BlameInput.class);
     when(input.fileSystem()).thenReturn(fs);
 
@@ -88,19 +86,21 @@ public class CvsBlameCommandTest {
   public void testParsingOfOutput() throws IOException, AuthenticationException, CommandException {
     File source = new File(baseDir, "src/foo.xoo");
     FileUtils.write(source, "sample content");
-    DefaultInputFile inputFile1 = new DefaultInputFile("foo", "src/foo.xoo")
-      .setAbsolutePath(new File(baseDir, "src/foo.xoo").getAbsolutePath())
-      .setLines(7);
+    InputFile inputFile1 = new TestInputFileBuilder("foo", "src/foo.xoo")
+      .setModuleBaseDir(baseDir.toPath())
+      .setLines(7)
+      .build();
     fs.add(inputFile1);
-    DefaultInputFile inputFile2 = new DefaultInputFile("foo", "src/foo.xoo")
-      .setAbsolutePath(new File(baseDir, "src/foo.xoo").getAbsolutePath())
-      .setLines(8);
+    InputFile inputFile2 = new TestInputFileBuilder("foo", "src/foo.xoo")
+      .setModuleBaseDir(baseDir.toPath())
+      .setLines(8)
+      .build();
     fs.add(inputFile2);
 
     BlameOutput result = mock(BlameOutput.class);
     CvsCommandExecutor commandExecutor = mock(CvsCommandExecutor.class);
 
-    when(commandExecutor.processCommand(eq("annotate"), any(GlobalOptions.class), any(String[].class), any(File.class), any(CVSListener.class))).thenAnswer(new Answer<Boolean>() {
+    when(commandExecutor.processCommand(eq("annotate"), any(), any(), any(), any())).thenAnswer(new Answer<Boolean>() {
 
       @Override
       public Boolean answer(InvocationOnMock invocation) throws Throwable {
@@ -113,7 +113,7 @@ public class CvsBlameCommandTest {
       }
     });
 
-    when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile1, inputFile2));
+    when(input.filesToBlame()).thenReturn(Arrays.asList(inputFile1, inputFile2));
 
     new CvsBlameCommand(mock(CvsConfiguration.class), new DefaultTempFolder(temp.newFolder()), commandExecutor).blame(input, result);
     verify(result).blameResult(inputFile1,
@@ -142,9 +142,10 @@ public class CvsBlameCommandTest {
   public void testUnknowError() throws IOException, AuthenticationException, CommandException {
     File source = new File(baseDir, "src/foo.xoo");
     FileUtils.write(source, "sample content");
-    DefaultInputFile inputFile = new DefaultInputFile("foo", "src/foo.xoo")
-      .setAbsolutePath(new File(baseDir, "src/foo.xoo").getAbsolutePath())
-      .setLines(7);
+    InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
+      .setModuleBaseDir(baseDir.toPath())
+      .setLines(7)
+      .build();
     fs.add(inputFile);
 
     BlameOutput result = mock(BlameOutput.class);
@@ -153,14 +154,14 @@ public class CvsBlameCommandTest {
     when(commandExecutor.processCommand(eq("annotate"), any(GlobalOptions.class), any(String[].class), any(File.class), any(CVSListener.class))).thenAnswer(new Answer<Boolean>() {
 
       @Override
-      public Boolean answer(InvocationOnMock invocation) throws Throwable {
+      public Boolean answer(InvocationOnMock invocation) {
         CVSListener listener = (CVSListener) invocation.getArguments()[4];
         listener.messageSent(new MessageEvent("", "Unknow error", true));
         return false;
       }
     });
 
-    when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile));
+    when(input.filesToBlame()).thenReturn(Arrays.asList(inputFile));
     File tempFile = temp.newFile("cvs");
     TempFolder tempFolder = mock(TempFolder.class);
     when(tempFolder.newDir("cvs")).thenReturn(tempFile);
@@ -175,17 +176,18 @@ public class CvsBlameCommandTest {
   }
 
   @Test
-  public void testAnnotateParams() throws IOException {
-    DefaultInputFile inputFile = new DefaultInputFile("foo", "src/foo.xoo")
-      .setAbsolutePath(new File(baseDir, "src/foo.xoo").getAbsolutePath())
-      .setLines(7);
+  public void testAnnotateParams() {
+    InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
+      .setModuleBaseDir(baseDir.toPath())
+      .setLines(7)
+      .build();
 
     CvsCommandExecutor commandExecutor = mock(CvsCommandExecutor.class);
-    Settings settings = new Settings(new PropertyDefinitions(CvsConfiguration.getProperties()));
+    MapSettings settings = new MapSettings(new PropertyDefinitions(CvsConfiguration.getProperties()));
     TempFolder tempFolder = mock(TempFolder.class);
     File tmp = new File("tmpcvs");
     when(tempFolder.newDir("cvs")).thenReturn(tmp);
-    CvsBlameCommand cvsBlameCommand = new CvsBlameCommand(new CvsConfiguration(settings), tempFolder, commandExecutor);
+    CvsBlameCommand cvsBlameCommand = new CvsBlameCommand(new CvsConfiguration(settings.asConfig()), tempFolder, commandExecutor);
 
     assertThat(cvsBlameCommand.buildAnnotateArguments(inputFile)).containsExactly("src/foo.xoo");
 
@@ -194,13 +196,13 @@ public class CvsBlameCommandTest {
   }
 
   @Test
-  public void testGlobalOptions() throws IOException {
+  public void testGlobalOptions() {
     CvsCommandExecutor commandExecutor = mock(CvsCommandExecutor.class);
-    Settings settings = new Settings(new PropertyDefinitions(CvsConfiguration.getProperties()));
+    MapSettings settings = new MapSettings(new PropertyDefinitions(CvsConfiguration.getProperties()));
     TempFolder tempFolder = mock(TempFolder.class);
     File tmp = new File("tmpcvs");
     when(tempFolder.newDir("cvs")).thenReturn(tmp);
-    CvsConfiguration config = new CvsConfiguration(settings);
+    CvsConfiguration config = new CvsConfiguration(settings.asConfig());
     CvsBlameCommand cvsBlameCommand = new CvsBlameCommand(config, tempFolder, commandExecutor);
 
     GlobalOptions globalOptions = cvsBlameCommand.buildGlobalOptions(baseDir);

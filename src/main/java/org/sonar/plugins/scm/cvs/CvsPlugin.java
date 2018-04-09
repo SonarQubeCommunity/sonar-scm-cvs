@@ -19,24 +19,16 @@
  */
 package org.sonar.plugins.scm.cvs;
 
-import com.google.common.collect.ImmutableList;
-import org.sonar.api.SonarPlugin;
+import org.sonar.api.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public final class CvsPlugin extends SonarPlugin {
+public final class CvsPlugin implements Plugin {
 
   @Override
-  public List getExtensions() {
-    List result = new ArrayList();
-    result.addAll(ImmutableList.of(
-      CvsScmProvider.class,
+  public void define(Context context) {
+    context.addExtensions(CvsScmProvider.class,
       CvsBlameCommand.class,
       CvsConfiguration.class,
-      CvsCommandExecutor.class));
-    result.addAll(CvsConfiguration.getProperties());
-    return result;
+      CvsCommandExecutor.class);
+    context.addExtensions(CvsConfiguration.getProperties());
   }
-
 }
