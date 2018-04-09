@@ -17,26 +17,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.plugins.scm.cvs;
+package org.sonarqube.scm.cvs;
 
-import org.junit.Test;
-import org.sonar.api.Plugin;
-import org.sonar.api.SonarQubeSide;
-import org.sonar.api.SonarRuntime;
-import org.sonar.api.internal.SonarRuntimeImpl;
-import org.sonar.api.utils.Version;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.TimeZone;
 
-public class CvsPluginTest {
+public class UTCRule extends TestWatcher {
 
-  @Test
-  public void getExtensions() {
-    SonarRuntime runtime = SonarRuntimeImpl.forSonarQube(Version.create(6, 7), SonarQubeSide.SCANNER);
-    Plugin.Context context = new Plugin.Context(runtime);
+  private TimeZone origDefault = TimeZone.getDefault();
 
-    new CvsPlugin().define(context);
+  @Override
+  protected void starting(Description description) {
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+  }
 
-    assertThat(context.getExtensions()).hasSize(12);
+  @Override
+  protected void finished(Description description) {
+    TimeZone.setDefault(origDefault);
   }
 }

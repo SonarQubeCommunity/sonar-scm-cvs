@@ -129,7 +129,7 @@
         <configuration>
           <pluginName>CVS</pluginName>
           <skipDependenciesPackaging>true</skipDependenciesPackaging>
-          <pluginClass>org.sonar.plugins.scm.cvs.CvsPlugin</pluginClass>
+          <pluginClass>org.sonarqube.scm.cvs.CvsPlugin</pluginClass>
         </configuration>
       </plugin>
       <plugin>

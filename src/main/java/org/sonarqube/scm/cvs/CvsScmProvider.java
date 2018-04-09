@@ -17,18 +17,34 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.plugins.scm.cvs;
+package org.sonarqube.scm.cvs;
 
-import org.sonar.api.Plugin;
+import org.sonar.api.batch.scm.BlameCommand;
+import org.sonar.api.batch.scm.ScmProvider;
 
-public final class CvsPlugin implements Plugin {
+import java.io.File;
+
+public class CvsScmProvider extends ScmProvider {
+
+  private final CvsBlameCommand blameCommand;
+
+  public CvsScmProvider(CvsBlameCommand blameCommand) {
+    this.blameCommand = blameCommand;
+  }
 
   @Override
-  public void define(Context context) {
-    context.addExtensions(CvsScmProvider.class,
-      CvsBlameCommand.class,
-      CvsConfiguration.class,
-      CvsCommandExecutor.class);
-    context.addExtensions(CvsConfiguration.getProperties());
+  public String key() {
+    return "cvs";
+  }
+
+  @Override
+  public boolean supports(File baseDir) {
+    File cvsDir = new File(baseDir, "CVS");
+    return cvsDir.exists() && cvsDir.isDirectory();
+  }
+
+  @Override
+  public BlameCommand blameCommand() {
+    return this.blameCommand;
   }
 }
