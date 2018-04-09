@@ -35,18 +35,19 @@ import org.netbeans.lib.cvsclient.connection.ConnectionFactory;
 import org.netbeans.lib.cvsclient.connection.PServerConnection;
 import org.netbeans.lib.cvsclient.connection.StandardScrambler;
 import org.netbeans.lib.cvsclient.event.CVSListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonar.api.BatchComponent;
 import org.sonar.api.batch.InstantiationStrategy;
+import org.sonar.api.batch.ScannerSide;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 
 /**
  * Highly inspired from Maven SCM CVS provider
  */
 @InstantiationStrategy(InstantiationStrategy.PER_BATCH)
-public class CvsCommandExecutor implements BatchComponent {
+@ScannerSide
+public class CvsCommandExecutor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CvsCommandExecutor.class);
+  private static final Logger LOG = Loggers.get(CvsCommandExecutor.class);
 
   /**
    * The connection to the server
@@ -70,8 +71,8 @@ public class CvsCommandExecutor implements BatchComponent {
    * does not exit the JVM and provides command output.
    *
    * @param args The command with options
-   * @throws AuthenticationException 
-   * @throws CommandException 
+   * @throws AuthenticationException
+   * @throws CommandException
    */
   public boolean processCommand(String command, GlobalOptions globalOptions, String[] args, File workingDir, CVSListener listener)
     throws AuthenticationException, CommandException {

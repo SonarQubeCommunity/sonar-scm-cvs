@@ -28,19 +28,19 @@ import org.apache.commons.io.FileUtils;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.scm.BlameCommand;
 import org.sonar.api.batch.scm.BlameLine;
 import org.sonar.api.utils.TempFolder;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 
 public class CvsBlameCommand extends BlameCommand {
 
   private static final String ANNOTATE = "annotate";
 
-  private static final Logger LOG = LoggerFactory.getLogger(CvsBlameCommand.class);
+  private static final Logger LOG = Loggers.get(CvsBlameCommand.class);
 
   private final CvsConfiguration config;
   private final TempFolder tempFolder;

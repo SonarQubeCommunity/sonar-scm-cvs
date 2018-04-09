@@ -19,21 +19,20 @@
  */
 package org.sonar.plugins.scm.cvs;
 
-import com.google.common.collect.ImmutableList;
-import org.sonar.api.BatchComponent;
+import java.util.Arrays;
+import java.util.List;
+import javax.annotation.CheckForNull;
 import org.sonar.api.CoreProperties;
 import org.sonar.api.PropertyType;
 import org.sonar.api.batch.InstantiationStrategy;
+import org.sonar.api.batch.ScannerSide;
+import org.sonar.api.config.Configuration;
 import org.sonar.api.config.PropertyDefinition;
-import org.sonar.api.config.Settings;
 import org.sonar.api.resources.Qualifiers;
 
-import javax.annotation.CheckForNull;
-
-import java.util.List;
-
 @InstantiationStrategy(InstantiationStrategy.PER_BATCH)
-public class CvsConfiguration implements BatchComponent {
+@ScannerSide
+public class CvsConfiguration {
 
   private static final String FALSE = "false";
   private static final String CATEGORY_CVS = "CVS";
@@ -47,14 +46,14 @@ public class CvsConfiguration implements BatchComponent {
 
   public static final String CVS_ROOT_PROP_KEY = "sonar.cvs.cvsRoot";
 
-  private final Settings settings;
+  private final Configuration settings;
 
-  public CvsConfiguration(Settings settings) {
+  public CvsConfiguration(Configuration settings) {
     this.settings = settings;
   }
 
   public static List<PropertyDefinition> getProperties() {
-    return ImmutableList.of(
+    return Arrays.asList(
       PropertyDefinition.builder(USER_PROP_KEY)
         .name("Username")
         .description("Username to be used for CVS authentication")
@@ -131,39 +130,39 @@ public class CvsConfiguration implements BatchComponent {
 
   @CheckForNull
   public String username() {
-    return settings.getString(USER_PROP_KEY);
+    return settings.get(USER_PROP_KEY).orElse(null);
   }
 
   @CheckForNull
   public String password() {
-    return settings.getString(PASSWORD_PROP_KEY);
+    return settings.get(PASSWORD_PROP_KEY).orElse(null);
   }
 
   public boolean compressionDisabled() {
-    return settings.getBoolean(DISABLE_COMPRESSION_PROP_KEY);
+    return settings.getBoolean(DISABLE_COMPRESSION_PROP_KEY).orElseThrow(() -> new IllegalStateException("Missing default value of " + DISABLE_COMPRESSION_PROP_KEY));
   }
 
   public int compressionLevel() {
-    return settings.getInt(COMPRESSION_LEVEL_PROP_KEY);
+    return settings.getInt(COMPRESSION_LEVEL_PROP_KEY).orElseThrow(() -> new IllegalStateException("Missing default value of " + COMPRESSION_LEVEL_PROP_KEY));
   }
 
   public boolean useCvsrc() {
-    return settings.getBoolean(USE_CVSRC_PROP_KEY);
+    return settings.getBoolean(USE_CVSRC_PROP_KEY).orElseThrow(() -> new IllegalStateException("Missing default value of " + USE_CVSRC_PROP_KEY));
   }
 
   @CheckForNull
   public String cvsRoot() {
-    return settings.getString(CVS_ROOT_PROP_KEY);
+    return settings.get(CVS_ROOT_PROP_KEY).orElse(null);
   }
 
   @CheckForNull
   public String revision() {
-    return settings.getString(REV_PROP_KEY);
+    return settings.get(REV_PROP_KEY).orElse(null);
   }
 
   @CheckForNull
   public String passphrase() {
-    return settings.getString(PASSPHRASE_PROP_KEY);
+    return settings.get(PASSPHRASE_PROP_KEY).orElse(null);
   }
 
 }

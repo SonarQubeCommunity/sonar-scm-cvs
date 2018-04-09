@@ -20,13 +20,23 @@
 package org.sonar.plugins.scm.cvs;
 
 import org.junit.Test;
+import org.sonar.api.Plugin;
+import org.sonar.api.SonarQubeSide;
+import org.sonar.api.SonarRuntime;
+import org.sonar.api.internal.SonarRuntimeImpl;
+import org.sonar.api.utils.Version;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CvsPluginTest {
 
   @Test
   public void getExtensions() {
-    assertThat(new CvsPlugin().getExtensions()).hasSize(12);
+    SonarRuntime runtime = SonarRuntimeImpl.forSonarQube(Version.create(6, 7), SonarQubeSide.SCANNER);
+    Plugin.Context context = new Plugin.Context(runtime);
+
+    new CvsPlugin().define(context);
+
+    assertThat(context.getExtensions()).hasSize(12);
   }
 }
