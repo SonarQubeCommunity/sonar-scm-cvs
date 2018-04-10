@@ -19,11 +19,11 @@
  */
 package org.sonarqube.scm.cvs;
 
-import com.google.common.base.Joiner;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
@@ -96,7 +96,7 @@ public class CvsBlameCommand extends BlameCommand {
     sb.append(" ");
     sb.append(ANNOTATE);
     sb.append(" ");
-    Joiner.on(' ').appendTo(sb, args);
+    sb.append(args.stream().collect(Collectors.joining(" ")));
     return sb.toString();
   }
 
