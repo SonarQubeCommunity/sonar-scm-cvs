@@ -37,6 +37,11 @@
     <url>https://github.com/SonarQubeCommunity/sonar-scm-cvs</url>
     <tag>HEAD</tag>
   </scm>
+
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/SonarSource/sonar-scm-cvs/issues</url>
+  </issueManagement>
   
 
   <properties>
