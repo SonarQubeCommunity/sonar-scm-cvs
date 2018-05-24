@@ -1,6 +1,6 @@
 # CVS Plugin
 
-[![Build Status](https://travis-ci.org/SonarSource/sonar-scm-cvs.svg?branch=master)](https://travis-ci.org/SonarSource/sonar-scm-cvs)
+[![Build Status](https://travis-ci.org/SonarQubeCommunity/sonar-scm-cvs.svg?branch=master)](https://travis-ci.org/SonarQubeCommunity/sonar-scm-cvs)
 
 Download and Versions information: http://update.sonarsource.org/plugins/scmcvs-confluence.html
 
@@ -45,6 +45,6 @@ The plugin use the Netbeans pure Java implementation of CVS client: https://vers
 
 ### License
 
-Copyright 2014-2017 SonarSource.
+Copyright 2014-2018 SonarSource.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)

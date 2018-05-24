@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.sonarsource.scm.cvs</groupId>
   <artifactId>sonar-scm-cvs-plugin</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.2-SNAPSHOT</version>
   <name>SonarQube :: Plugins :: SCM :: CVS</name>
   <packaging>sonar-plugin</packaging>
   <description>CVS SCM Provider</description>
@@ -42,13 +42,6 @@
     <system>github</system>
     <url>https://github.com/SonarSource/sonar-scm-cvs/issues</url>
   </issueManagement>
-  
-
-  <properties>
-    <gitRepositoryName>sonar-scm-cvs</gitRepositoryName>
-    <!-- Release: enable publication to Bintray -->
-    <artifactsToPublish>${project.groupId}:${project.artifactId}:jar</artifactsToPublish>
-  </properties>
 
   <dependencies>
     <dependency>
