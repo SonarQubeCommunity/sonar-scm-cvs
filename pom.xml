@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonarsource.parent</groupId>
     <artifactId>parent</artifactId>
-    <version>45</version>
+    <version>44</version>
   </parent>
   <groupId>org.sonarsource.scm.cvs</groupId>
   <artifactId>sonar-scm-cvs-plugin</artifactId>
@@ -12,13 +12,8 @@
   <name>SonarQube :: Plugins :: SCM :: CVS</name>
   <packaging>sonar-plugin</packaging>
   <description>CVS SCM Provider</description>
-  <url>http://redirect.sonarsource.com/plugins/scmcvs.html</url>
+  <url>https://github.com/SonarQubeCommunity/sonar-scm-cvs</url>
   <inceptionYear>2014</inceptionYear>
-
-  <organization>
-    <name>SonarSource</name>
-    <url>https://www.sonarsource.com</url>
-  </organization>
 
   <licenses>
     <license>
@@ -37,21 +32,12 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:SonarSource/sonar-scm-cvs.git</connection>
-    <developerConnection>scm:git:git@github.com:SonarSource/sonar-scm-cvs.git</developerConnection>
-    <url>https://github.com/SonarSource/sonar-scm-cvs</url>
+    <connection>scm:git:git@github.com:SonarQubeCommunity/sonar-scm-cvs.git</connection>
+    <developerConnection>scm:git:git@github.com:SonarQubeCommunity/sonar-scm-cvs.git</developerConnection>
+    <url>https://github.com/SonarQubeCommunity/sonar-scm-cvs</url>
     <tag>HEAD</tag>
   </scm>
   
-  <issueManagement>
-    <system>jira</system>
-    <url>https://jira.sonarsource.com/browse/SONARSCCVS</url>
-  </issueManagement>
-  
-  <ciManagement>
-    <system>TravisCI</system>
-    <url>https://travis-ci.org/SonarSource/sonar-scm-cvs</url>
-  </ciManagement>
 
   <properties>
     <gitRepositoryName>sonar-scm-cvs</gitRepositoryName>
