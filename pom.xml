@@ -135,6 +135,13 @@
                     <exclude>NOTICE*</exclude>
                   </excludes>
                 </filter>
+                <filter>
+                   <artifact>org.netbeans.lib:cvsclient</artifact>
+                   <includes>
+                     <!-- CVSClient uses reflection to load commands. --> 
+                     <include>**</include>
+                   </includes>
+                </filter> 
               </filters>
             </configuration>
           </execution>
