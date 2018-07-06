@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.org/SonarQubeCommunity/sonar-scm-cvs.svg?branch=master)](https://travis-ci.org/SonarQubeCommunity/sonar-scm-cvs)
 
-Download and Versions information: http://update.sonarsource.org/plugins/scmcvs-confluence.html
-
 ## Description / Features
 Implements SCM dependent features of SonarQube for CVS projects. Pure Java implementation so no need to have CVS command line tool installed on the computer doing the SQ analysis.
 
